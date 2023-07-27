@@ -56,6 +56,7 @@ function TsTypeToGoType(tstype, genConfig, modelConfig) {
         /** @type {(s:string) => string} */
         let handleTypename = (tstypename) => {
             switch (tstypename) {
+                case 'String': return 'string'
                 case 'Date': {
                     if (('time' in genConfig.importPackages) == false) {
                         genConfig.importPackages.push('time')
@@ -63,13 +64,14 @@ function TsTypeToGoType(tstype, genConfig, modelConfig) {
                     return 'time.Time'
                 }
                 case 'boolean': return 'bool'
+                case 'any': return 'interface{}'
             }
             // 处理数组
             if (tstypename.endsWith('[]')) {
                 tstypename = '[]' + handleTypename(tstypename.substring(0, tstypename.length - 2))
             }
             // 处理map
-            let res = tstypename.match(/Map<(.*), *(.*)>/)
+            let res = tstypename.match(/(?:Map|Record)<(.*), *(.*)>/)
             if (res) {
                 tstypename = `map[${handleTypename(res[1])}]${handleTypename(res[2])}`
             }
@@ -151,7 +153,7 @@ function GoTagsToString(tags) {
 
 /**
  * @param {tsmorph.TypeLiteralNode | tsmorph.ClassDeclaration} clz
- * @param {{baseIndent: number, annonymous: boolean}} cfg
+ * @param {{baseIndent: number, annonymous: boolean, fileName?: string}} cfg
  */
 function TsClassToGoSrc(clz, cfg) {
 
@@ -164,6 +166,7 @@ function TsClassToGoSrc(clz, cfg) {
         modelName: getPropertyLiteralValue(goModelArgs, 'modelName') ?? (clz instanceof tsmorph.ClassDeclaration ? clz.getName() : 'UNNAMED'),
         generateTags: getPropertyLiteralValue(goModelArgs, 'generateTags') ?? ['json'],
     }
+    cfg.fileName = modelConfig.modelName + '.go'
     let genConfig = { baseIndent: cfg.baseIndent + 1, importPackages: [] }
     let def = {
         ...modelConfig,
@@ -203,8 +206,9 @@ function main() {
     const classes = project.getSourceFiles().flatMap((src) => src.getClasses())
     const goModelClasses = classes.filter((clz) => clz.getDecorator('GoModel'))
     goModelClasses.forEach((clz) => {
-        var goSrc = TsClassToGoSrc(clz, { annonymous: false, baseIndent: 0 })
-        fs.writeFileSync(`${globalConfig.outputModelDir}/${clz.getName()}.go`, goSrc)
+        let cfg = { annonymous: false, baseIndent: 0, fileName: '' }
+        var goSrc = TsClassToGoSrc(clz, cfg)
+        fs.writeFileSync(`${globalConfig.outputModelDir}/${cfg.fileName}`, goSrc)
     })
 }
 

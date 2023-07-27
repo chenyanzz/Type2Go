@@ -12,6 +12,8 @@ const globalConfig = {
         json: 'smallCamel',
         bson: 'BigCamel',
         gorm: 'snake_case',
+        // add more members here
+        // to support more generated auto-naming tags
     },
     inputModelPath: './ts_models/*.ts',
     outputModelDir: './go_models/',
