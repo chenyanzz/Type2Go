@@ -2,7 +2,8 @@
 
 import * as fs from 'fs';
 import * as naming from 'naming-style';
-import * as tsmorph from "ts-morph";
+import * as tsmorph from 'ts-morph';
+import { VM } from 'vm2';
 import { globalConfig } from './config.js';
 
 /** @type {Record<import('./config').NamingConvention, (s: string)=>string>} */
@@ -21,8 +22,11 @@ const NamingConventionMap = {
 function getLiteralNodeValue(node) {
     if (!node) return null
     const txt = node.getText()
-    // TODO UNSAFE HERE
-    return eval(`(${txt})`)
+    const vm = new VM({
+        timeout: 1000
+    })
+    const val = vm.run(`(${txt})`)
+    return val
 }
 
 /**
