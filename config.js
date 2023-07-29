@@ -1,7 +1,7 @@
 // @ts-check
 
 /**
- * @typedef {'BigCamel' | 'smallCamel' | 'snake_case'} NamingConvention
+ * @typedef {'BigCamel' | 'smallCamel' | 'snake_case' | 'unchanged'} NamingConvention
  */
 
 /**
@@ -9,7 +9,7 @@
  */
 const globalConfig = {
     naming: {
-        json: 'smallCamel',
+        json: 'unchanged',
         bson: 'BigCamel',
         gorm: 'snake_case',
         // add more members here

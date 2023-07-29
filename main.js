@@ -14,6 +14,7 @@ const NamingConventionMap = {
     'smallCamel': naming.camel,
     // @ts-ignore
     'snake_case': naming.snake,
+    'unchanged': (s) => s,
 }
 
 /**
@@ -25,6 +26,7 @@ function getLiteralNodeValue(node) {
     const vm = new VM({
         timeout: 1000
     })
+
     const val = vm.run(`(${txt})`)
     return val
 }
