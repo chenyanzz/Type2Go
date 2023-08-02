@@ -114,7 +114,7 @@ function getGoTags(member, modelConfig) {
 
     Object.entries(allExtraTags).forEach(([tagname, _extraTags]) => {
         // @ts-ignore
-        const extraTags = typeof _extraTags === 'string' ? _extraTags : _extraTags.join(';')
+        const extraTags = typeof _extraTags === 'string' ? _extraTags : _extraTags.join(',')
         let index = generatedTags.findIndex(([exsitingTagname, _]) => exsitingTagname == tagname)
         if (index == -1) {
             generatedTags.push([tagname, extraTags])

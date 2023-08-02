@@ -62,7 +62,7 @@ type UserModel struct {
 
     Id string `json:"id;omitempty" gorm:"id" bson:"Id"` 
     Name string `json:"name" gorm:"name" bson:"UserName"` 
-    SomeArray []time.Time `json:"someArray" gorm:"some_array" bson:"SomeArray" sometag:"a;b"` 
+    SomeArray []time.Time `json:"someArray" gorm:"some_array" bson:"SomeArray" sometag:"a,b"` 
     SomeNullable *string `json:"someNullable" gorm:"some_nullable" bson:"SomeNullable"` /* nullable */
     SomeMap map[string][]int `json:"someMap" gorm:"some_map" bson:"SomeMap"` 
     SomeInlineType struct {
