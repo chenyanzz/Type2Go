@@ -55,7 +55,8 @@ function getPropertyLiteralValue(obj, propName) {
 function TsTypeToGoType(tstype, genConfig, modelConfig) {
     if (tstype.getText().startsWith('{')) {
         const innerClass = tstype.asKindOrThrow(tsmorph.SyntaxKind.TypeLiteral)
-        return TsClassToGoSrc(innerClass, { annonymous: true, baseIndent: genConfig.baseIndent })
+        // FIXME: decorators!
+        return TsClassToGoSrc(innerClass, { annonymous: true, baseIndent: genConfig.baseIndent, modelConfig: modelConfig })
     } else {
         let tstypename = tstype.getText()
 
@@ -64,7 +65,7 @@ function TsTypeToGoType(tstype, genConfig, modelConfig) {
             switch (tstypename) {
                 case 'String': return 'string'
                 case 'Date': {
-                    if (('time' in genConfig.importPackages) == false) {
+                    if (!genConfig.importPackages.includes('time')) {
                         genConfig.importPackages.push('time')
                     }
                     return 'time.Time'
@@ -159,7 +160,7 @@ function GoTagsToString(tags) {
 
 /**
  * @param {tsmorph.TypeLiteralNode | tsmorph.ClassDeclaration} clz
- * @param {{baseIndent: number, annonymous: boolean, fileName?: string}} cfg
+ * @param {{baseIndent: number, annonymous: boolean, fileName?: string, modelConfig?: modelConfig}} cfg
  */
 function TsClassToGoSrc(clz, cfg) {
 
@@ -167,7 +168,7 @@ function TsClassToGoSrc(clz, cfg) {
         clz.getDecorator?.('GoModel')?.getArguments()?.[0]?.asKind(tsmorph.SyntaxKind.ObjectLiteralExpression) ?? null : null;
 
     /** @type {GoModelConfig?} */
-    const modelConfig = {
+    const modelConfig = cfg.modelConfig ?? {
         packageName: getPropertyLiteralValue(goModelArgs, 'packageName') ?? 'model',
         modelName: getPropertyLiteralValue(goModelArgs, 'modelName') ?? (clz instanceof tsmorph.ClassDeclaration ? clz.getName() : 'UNNAMED'),
         generateTags: getPropertyLiteralValue(goModelArgs, 'generateTags') ?? ['json'],
